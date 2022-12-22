@@ -1,0 +1,28 @@
+jobs:
+  database-continuous-integration:
+    runs-on: ubuntu-latest
+    container:
+      image: liquibase/liquibase:latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: admin
+    
+    env:
+      LIQUIBASE_LICENSE_KEY: ${{ secrets.PRO_LICENSE_KEY}}
+      LIQUIBASE_COMMAND_URL: "jdbc:postgresql://postgres:5432/"
+      LIQUIBASE_COMMAND_USERNAME: "admin"
+      LIQUIBASE_COMMAND_PASSWORD: "admin"
+      LIQUIBASE_COMMAND_CHANGELOG_FOLE: "liquibase-github/changelogs/omdb-relese-2.sql"
+      LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-github/flowsliquibase.checks-settings.conf"
+      LIQUIBASE_COMMAND_DRIVER: "org.postgresql.Driver"
+      LIQUIBASE_FLOW_ENV: "CI"
+      LIQUIBASE_FLOW_DIR: "liquibase-github/flows"
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v3
+
+      - name: Deploy and Validate Database Changes
+        run: kiquibase flow --flowfile="iquibase-github/flows/validate-changes-update-db.yaml"
