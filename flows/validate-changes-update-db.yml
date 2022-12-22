@@ -1,0 +1,31 @@
+stages
+  validateChangelog:
+    action:
+    - type: liquibase
+      command: validate
+      cmdArg: {}
+    
+    - type: liquibase
+      command: checks rune
+      cmdArg: {} 
+
+  generateUpdateInfo:
+    action:
+    - type: liquibase
+      if: "${LIQUIBASE_FLOW_ENV} != dev"
+      command: flow
+      cmdArg: {flow-file: "${LIQUIBASE_FLOW_DIR}/generate-update-info.yaml"}
+
+  liquibaseUpdate:
+    action:
+    - type: liquibase
+      command: valupdate
+      cmdArg: {}
+
+  databseChecks:
+    action:
+    - type: liquibase
+      command: checks run
+      cmdArg: {checks-scope: "databse"}
+      
+
